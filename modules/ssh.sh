@@ -126,7 +126,9 @@ function ssh_bruteforce() {
     log_debug "[$MODULE_NAME] hydra -L $userlist -P $wordlist -e nsr -t 4 -w 30 ssh://$target"
     
     # Run hydra with proper timeout and thread limit
-    timeout 600 hydra \
+    # Use timeout wrapper with progress
+    run_with_timeout 600 "SSH-Brute" \
+        hydra \
         -L "$userlist" \
         -P "$wordlist" \
         -e nsr \

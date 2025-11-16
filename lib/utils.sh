@@ -4,6 +4,15 @@
 
 set -euo pipefail
 
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIB_DIR="$SCRIPT_DIR"
+
+# Source timeout wrapper if available
+if [ -f "$LIB_DIR/timeout_wrapper.sh" ]; then
+    source "$LIB_DIR/timeout_wrapper.sh"
+fi
+
 # Color definitions
 export RED='\e[1;91m'
 export GREEN='\e[32m'

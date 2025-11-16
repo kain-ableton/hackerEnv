@@ -146,7 +146,7 @@ function metasploit_run_exploit() {
     local json_file="${output_dir}/msf_${exploit_name}.json"
     
     # Run in background with JSON output for parsing
-    timeout 300 msfconsole -q -r "$rc_file" -o "$log_file" 2>&1 &
+    msfconsole -q -r "$rc_file" -o "$log_file" 2>&1 &
     local msf_pid=$!
     
     log_info "[$MODULE_NAME] Metasploit running (PID: $msf_pid)"
@@ -155,6 +155,9 @@ function metasploit_run_exploit() {
     # Save PID for tracking and cleanup
     echo "$msf_pid" > "${output_dir}/.msf_${exploit_name}.pid"
     MSF_PIDS["$exploit_name"]=$msf_pid
+    
+    # Monitor with progress and hang detection
+    monitor_command "$msf_pid" "MSF-${exploit_name}" 300 15 || log_warning "[$MODULE_NAME] Metasploit monitoring ended"
     
     return 0
 }

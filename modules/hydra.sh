@@ -83,7 +83,9 @@ function hydra_ssh_bruteforce() {
     log_info "[$MODULE_NAME] Using passlist: $passlist"
     log_warning "[$MODULE_NAME] This may take a while..."
     
-    if timeout 600 hydra -t "$threads" -I -L "$userlist" -P "$passlist" \
+    # Use timeout wrapper with progress
+    if run_with_timeout 600 "Hydra-SSH" \
+        hydra -t "$threads" -I -L "$userlist" -P "$passlist" \
         "ssh://${target}" -o "$output_file" 2>&1 | tee -a "${output_file}.log"; then
         
         if grep -q "login:" "$output_file" 2>/dev/null; then
@@ -114,7 +116,9 @@ function hydra_ftp_bruteforce() {
     
     local output_file="${output_dir}/ftp_bruteforce.txt"
     
-    if timeout 600 hydra -t "$threads" -I -L "$userlist" -P "$passlist" \
+    # Use timeout wrapper with progress
+    if run_with_timeout 600 "Hydra-FTP" \
+        hydra -t "$threads" -I -L "$userlist" -P "$passlist" \
         "ftp://${target}" -o "$output_file" 2>&1 | tee -a "${output_file}.log"; then
         
         if grep -q "login:" "$output_file" 2>/dev/null; then
@@ -145,7 +149,9 @@ function hydra_telnet_bruteforce() {
     
     local output_file="${output_dir}/telnet_bruteforce.txt"
     
-    if timeout 600 hydra -t "$threads" -I -L "$userlist" -P "$passlist" \
+    # Use timeout wrapper with progress
+    if run_with_timeout 600 "Hydra-Telnet" \
+        hydra -t "$threads" -I -L "$userlist" -P "$passlist" \
         "telnet://${target}" -o "$output_file" 2>&1 | tee -a "${output_file}.log"; then
         
         if grep -q "login:" "$output_file" 2>/dev/null; then
@@ -176,7 +182,9 @@ function hydra_smb_bruteforce() {
     
     local output_file="${output_dir}/smb_bruteforce.txt"
     
-    if timeout 600 hydra -t "$threads" -I -L "$userlist" -P "$passlist" \
+    # Use timeout wrapper with progress
+    if run_with_timeout 600 "Hydra-SMB" \
+        hydra -t "$threads" -I -L "$userlist" -P "$passlist" \
         "smb://${target}" -o "$output_file" 2>&1 | tee -a "${output_file}.log"; then
         
         if grep -q "login:" "$output_file" 2>/dev/null; then
@@ -207,7 +215,9 @@ function hydra_mysql_bruteforce() {
     
     local output_file="${output_dir}/mysql_bruteforce.txt"
     
-    if timeout 600 hydra -t "$threads" -I -L "$userlist" -P "$passlist" \
+    # Use timeout wrapper with progress
+    if run_with_timeout 600 "Hydra-MySQL" \
+        hydra -t "$threads" -I -L "$userlist" -P "$passlist" \
         "mysql://${target}" -o "$output_file" 2>&1 | tee -a "${output_file}.log"; then
         
         if grep -q "login:" "$output_file" 2>/dev/null; then
