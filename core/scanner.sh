@@ -165,6 +165,18 @@ function scan_host() {
     # Parse results
     parse_scan_results "${output_base}.xml"
     
+    # Run UDP scan if enabled
+    if [ "${ENABLE_UDP_SCAN:-false}" = true ]; then
+        log_info "Starting UDP service discovery..."
+        if udpx_scan_target "$target" "$output_dir"; then
+            local udpx_results="${output_dir}/udpx/udpx_scan.jsonl"
+            if [ -f "$udpx_results" ]; then
+                udpx_check_interesting_services "$udpx_results"
+                udpx_export_to_nmap_format "$udpx_results" "${output_dir}/udpx/udpx_nmap_format.txt"
+            fi
+        fi
+    fi
+    
     # Run service-specific scripts if open ports found
     run_service_scripts "$target" "$output_dir"
     

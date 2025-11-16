@@ -19,6 +19,7 @@ source "${SCRIPT_DIR}/modules/ssh.sh"
 source "${SCRIPT_DIR}/modules/metasploit.sh"
 source "${SCRIPT_DIR}/modules/hydra.sh"
 source "${SCRIPT_DIR}/modules/post_exploitation.sh"
+source "${SCRIPT_DIR}/modules/udpx.sh"
 
 # Load toolchain manager
 if [ -f "${SCRIPT_DIR}/toolchains/toolchain_manager.sh" ]; then
@@ -79,6 +80,7 @@ Options:
   -s, --subnet <MASK>        Subnet mask (e.g., 24)
   -a, --attacker <IP>        Attacker IP address
   -m, --mode <MODE>          Scan mode: quick, normal, full, stealth, udp (default: normal)
+  --udp-scan                 Enable UDP scanning with UDPX
   -e, --aggressive           Enable aggressive scanning mode
   -c, --config <FILE>        Configuration file (default: config/settings.conf)
   -v, --verbose              Verbose mode (show info messages)
@@ -98,6 +100,15 @@ Options:
 Scan Modes:
   quick    - Fast scan of common ports (top 100)
   normal   - Standard scan with service detection (default)
+  full     - Comprehensive scan of all 65535 ports
+  stealth  - Stealthy scan with timing delays
+  udp      - UDP-only scan (legacy, use --udp-scan instead)
+
+UDP Scanning:
+  --udp-scan enables UDPX integration for fast UDP service discovery
+  Supports 45+ services including IPMI, SNMP, IKE, Kerberos, LDAP, etc.
+  
+  Example: ./hackerEnv2 -t 192.168.1.0/24 --udp-scan -vv
   full     - Comprehensive scan of all 65535 ports
   stealth  - Slow, stealthy SYN scan to avoid detection
   udp      - UDP port scan (slow)
@@ -152,6 +163,7 @@ function parse_arguments() {
     TOOLCHAIN_MODE="auto"
     RUN_TOOLCHAINS=true
     ENABLE_BRUTEFORCE=false
+    ENABLE_UDP_SCAN=false
     GENERATE_REPORT=false
     GENERATE_DOCX=false
     
@@ -212,6 +224,10 @@ function parse_arguments() {
             --bruteforce)
                 ENABLE_BRUTEFORCE=true
                 export CONFIG_BRUTEFORCE_ENABLED=true
+                shift
+                ;;
+            --udp-scan)
+                ENABLE_UDP_SCAN=true
                 shift
                 ;;
             --no-vuln-scan)

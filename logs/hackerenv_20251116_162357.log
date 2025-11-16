@@ -1,0 +1,67 @@
+[2025-11-16 16:23:57] [DEBUG] Loading available toolchains...
+[2025-11-16 16:23:57] [DEBUG] Loaded: database_toolchain.sh
+[2025-11-16 16:23:57] [DEBUG] Loaded: dns_toolchain.sh
+[2025-11-16 16:23:57] [DEBUG] Loaded: ftp_toolchain.sh
+[2025-11-16 16:23:57] [DEBUG] Loaded: smb_toolchain.sh
+[2025-11-16 16:23:57] [DEBUG] Loaded: smtp_toolchain.sh
+[2025-11-16 16:23:57] [DEBUG] Loaded: ssh_toolchain.sh
+[2025-11-16 16:23:57] [DEBUG] Loaded: web_toolchain.sh
+[2025-11-16 16:23:57] [DEBUG] Verbosity: NORMAL (errors, warnings, success)
+[2025-11-16 16:23:57] [DEBUG] Configuration loaded from: /home/k/hackerEnv/config/settings.conf
+[2025-11-16 16:23:57] [SUCCESS] Configuration loaded: /home/k/hackerEnv/config/settings.conf
+[2025-11-16 16:23:57] [INFO] Checking required dependencies...
+[2025-11-16 16:23:57] [INFO] Checking optional dependencies...
+[2025-11-16 16:23:57] [SUCCESS] All required dependencies found
+[2025-11-16 16:23:57] [INFO] Processing 1 target(s)...
+[2025-11-16 16:23:57] [INFO] [1/1] Processing target: 10.10.11.87
+[2025-11-16 16:23:57] [INFO] Starting NORMAL scan on: 10.10.11.87
+[2025-11-16 16:23:57] [DEBUG] Running: nmap -sV -T4 -A -O 10.10.11.87 -oA /home/k/hackerEnv/targets/10.10.11.87/nmap_10.10.11.87
+[2025-11-16 16:24:19] [SUCCESS] Port scan completed for 10.10.11.87
+[2025-11-16 16:24:19] [INFO] Parsing scan results...
+[2025-11-16 16:24:19] [INFO] Open ports found:
+22/tcp ssh OpenSSH 10.0p2 Debian 8
+[2025-11-16 16:24:19] [INFO] Running service-specific nmap scripts for 10.10.11.87
+[2025-11-16 16:24:19] [DEBUG] Found 1 service(s) to analyze
+[2025-11-16 16:24:19] [INFO] Running SSH enumeration scripts on 10.10.11.87
+[2025-11-16 16:24:19] [DEBUG] Running: nmap --script ssh-auth-methods,ssh-hostkey,ssh2-enum-algos,sshv1 -sV 10.10.11.87 -oA /home/k/hackerEnv/targets/10.10.11.87/service_scripts_10.10.11.87_ssh
+[2025-11-16 16:24:24] [SUCCESS] Ran service-specific scripts for 1 service(s)
+[2025-11-16 16:24:24] [DEBUG] Extracting service information from: /home/k/hackerEnv/targets/10.10.11.87/nmap_10.10.11.87.xml
+[2025-11-16 16:24:24] [DEBUG] Service information extracted to: /home/k/hackerEnv/targets/10.10.11.87
+[2025-11-16 16:24:24] [INFO] Starting vulnerability scan on: 10.10.11.87
+[2025-11-16 16:24:24] [DEBUG] Running: nmap --script vulners,vulscan/ 10.10.11.87 -oA /home/k/hackerEnv/targets/10.10.11.87/vuln_scan_10.10.11.87
+[2025-11-16 16:24:27] [SUCCESS] Vulnerability scan completed for 10.10.11.87
+[2025-11-16 16:24:27] [INFO] Running exploit modules for: 10.10.11.87
+[2025-11-16 16:24:27] [INFO] [POST_EXPLOIT] Starting SSH module for: 10.10.11.87
+[2025-11-16 16:24:27] [INFO] [POST_EXPLOIT] Checking SSH vulnerabilities for: 10.10.11.87
+[2025-11-16 16:24:27] [INFO] [POST_EXPLOIT] SSH version detected: OpenSSH 10.0p2 Debian 8
+[2025-11-16 16:24:27] [INFO] [POST_EXPLOIT] SSH module completed for: 10.10.11.87
+[2025-11-16 16:24:27] [INFO] Running Metasploit module for: 10.10.11.87
+[2025-11-16 16:24:27] [SUCCESS] [POST_EXPLOIT] Metasploit Framework available
+[2025-11-16 16:24:27] [INFO] [POST_EXPLOIT] Using tun0 interface: 10.10.15.57
+[2025-11-16 16:24:27] [INFO] [POST_EXPLOIT] Starting Metasploit module for: 10.10.11.87
+[2025-11-16 16:24:27] [INFO] [POST_EXPLOIT] Local host (LHOST): 10.10.15.57
+[2025-11-16 16:24:27] [INFO] [POST_EXPLOIT] SSH service detected - running enumeration
+[2025-11-16 16:24:27] [INFO] [POST_EXPLOIT] Running SSH user enumeration
+[2025-11-16 16:24:35] [SUCCESS] [POST_EXPLOIT] SSH enumeration complete: /home/k/hackerEnv/targets/10.10.11.87/metasploit/ssh_enum_users.txt
+[2025-11-16 16:24:35] [INFO] [POST_EXPLOIT] Waiting for Metasploit jobs to complete (timeout: 120s)
+[2025-11-16 16:24:35] [SUCCESS] [POST_EXPLOIT] All Metasploit jobs completed
+[2025-11-16 16:24:35] [INFO] [POST_EXPLOIT] Summary generated: /home/k/hackerEnv/targets/10.10.11.87/metasploit/metasploit_summary.txt
+[2025-11-16 16:24:35] [SUCCESS] [POST_EXPLOIT] Metasploit module completed for: 10.10.11.87
+[2025-11-16 16:24:35] [INFO] [POST_EXPLOIT] Results saved in: /home/k/hackerEnv/targets/10.10.11.87/metasploit
+[2025-11-16 16:24:35] [INFO] [POST_EXPLOIT] Exploits attempted: 1
+[2025-11-16 16:24:35] [INFO] Running toolchains for: 10.10.11.87
+[2025-11-16 16:24:35] [INFO] Detecting applicable toolchains based on services...
+[2025-11-16 16:24:35] [INFO] Detected SSH - will run SSH toolchain
+[2025-11-16 16:24:35] [INFO] Running 1 toolchain(s) for 10.10.11.87
+[2025-11-16 16:24:35] [INFO] Running ssh toolchain...
+[2025-11-16 16:24:35] [INFO] [WEB] Starting SSH toolchain for 10.10.11.87:22
+[2025-11-16 16:24:35] [INFO] [WEB] Checking available SSH tools...
+[2025-11-16 16:24:35] [SUCCESS] [WEB] Found: ssh
+[2025-11-16 16:24:35] [SUCCESS] [WEB] Found: ssh-keyscan
+[2025-11-16 16:24:35] [SUCCESS] [WEB] Found: nmap
+[2025-11-16 16:24:35] [INFO] [WEB] Grabbing SSH banner from 10.10.11.87:22
+[2025-11-16 16:24:40] [SUCCESS] [WEB] Banner captured
+[2025-11-16 16:24:40] [INFO] [WEB] Scanning SSH keys on 10.10.11.87:22
+[2025-11-16 16:24:43] [SUCCESS] [WEB] SSH keys captured
+[2025-11-16 16:24:43] [INFO] [WEB] Testing SSH authentication methods on 10.10.11.87:22
+[2025-11-16 16:24:53] [INFO] [WEB] Scanning supported algorithms on 10.10.11.87:22
