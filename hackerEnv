@@ -81,7 +81,7 @@ if [ -f "${dir_path}/urIp.txt" ]
 then
         rm "${dir_path}/urIp.txt"
 fi
-if [ ! -d ${dir_path}/exploits/ ]
+if [ ! -d "${dir_path}/exploits/" ]
 then
 	mkdir -p ${dir_path}/exploits/{smb,ssh,ftp,apache,telnet}
 fi
