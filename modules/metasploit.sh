@@ -9,6 +9,9 @@ source "$(dirname "${BASH_SOURCE[0]}")/../lib/utils.sh"
 MODULE_NAME="METASPLOIT"
 MODULE_VERSION="2.0"
 
+# Initialize associative array for PID tracking
+declare -A MSF_PIDS
+
 # Smart LHOST detection - prioritize VPN interfaces
 function metasploit_get_lhost() {
     local lhost=""
@@ -170,20 +173,24 @@ function metasploit_wait_jobs() {
     log_info "[$MODULE_NAME] Waiting for Metasploit jobs to complete (timeout: ${timeout}s)"
     
     local elapsed=0
+    local last_count=0
+    
     while [ $elapsed -lt $timeout ]; do
         local running=0
+        local pids_to_kill=()
+        
         for pid_file in "${output_dir}"/.msf_*.pid; do
             [ -f "$pid_file" ] || continue
             local pid
             pid=$(cat "$pid_file" 2>/dev/null || echo "0")
             if [ "$pid" != "0" ] && ps -p "$pid" > /dev/null 2>&1; then
                 running=$((running + 1))
+                pids_to_kill+=("$pid")
             else
-                rm -f "$pid_file"
-                # Also remove from global tracking
+                rm -f "$pid_file" 2>/dev/null || true
                 local fname=$(basename "$pid_file" .pid)
                 fname="${fname#.msf_}"
-                unset "MSF_PIDS[$fname]"
+                unset "MSF_PIDS[$fname]" 2>/dev/null || true
             fi
         done
         
@@ -193,9 +200,30 @@ function metasploit_wait_jobs() {
             return 0
         fi
         
-        # Use shorter sleep with checks to be more responsive to interrupts
-        sleep 2 || return 1
-        elapsed=$((elapsed + 2))
+        # Show progress every 10 seconds
+        if [ $((elapsed % 10)) -eq 0 ] && [ $running -ne $last_count ]; then
+            log_info "[$MODULE_NAME] $running job(s) still running... (${elapsed}s elapsed)"
+            last_count=$running
+        fi
+        
+        # Check for interrupt signal - if received, kill all MSF processes
+        if ! kill -0 $$ 2>/dev/null; then
+            log_warning "[$MODULE_NAME] Interrupt detected - terminating Metasploit jobs"
+            for pid in "${pids_to_kill[@]}"; do
+                kill -TERM "$pid" 2>/dev/null || true
+            done
+            return 1
+        fi
+        
+        # Use shorter sleep for better responsiveness
+        sleep 1 || {
+            log_warning "[$MODULE_NAME] Sleep interrupted - cleaning up"
+            for pid in "${pids_to_kill[@]}"; do
+                kill -TERM "$pid" 2>/dev/null || true
+            done
+            return 1
+        }
+        elapsed=$((elapsed + 1))
     done
     
     log_warning "[$MODULE_NAME] Timeout reached, killing remaining jobs"
@@ -329,11 +357,11 @@ function metasploit_ssh_enumusers() {
     
     local output_file="${output_dir}/ssh_enum_users.txt"
     
-    msfconsole -q -x "use auxiliary/scanner/ssh/ssh_enumusers; \
+    timeout 300 msfconsole -q -x "use auxiliary/scanner/ssh/ssh_enumusers; \
         set RHOSTS $target; \
         set USER_FILE $userlist; \
         run; \
-        exit" > "$output_file" 2>&1
+        exit" > "$output_file" 2>&1 || log_warning "[$MODULE_NAME] SSH enumeration timed out or failed"
     
     log_success "[$MODULE_NAME] SSH enumeration complete: $output_file"
 }

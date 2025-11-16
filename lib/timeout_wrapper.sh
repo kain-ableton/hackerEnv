@@ -120,6 +120,9 @@ function monitor_command() {
     while kill -0 "$pid" 2>/dev/null; do
         if [ $elapsed -ge $max_wait ]; then
             log_warning "[$command_name] Max wait time exceeded (${max_wait}s)"
+            kill -TERM "$pid" 2>/dev/null || true
+            sleep 1
+            kill -KILL "$pid" 2>/dev/null || true
             return 124
         fi
         
@@ -147,7 +150,7 @@ function monitor_command() {
             fi
         fi
         
-        sleep 1
+        sleep 1 || return 130
         ((elapsed++))
     done
     

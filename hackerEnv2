@@ -6,6 +6,39 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Signal handling for clean exit
+CLEANUP_DONE=0
+cleanup_on_exit() {
+    # Prevent multiple cleanup calls
+    if [ "$CLEANUP_DONE" -eq 1 ]; then
+        return
+    fi
+    CLEANUP_DONE=1
+    
+    local exit_code=$?
+    echo "" >&2
+    log_info "Received interrupt signal - cleaning up..."
+    
+    # Kill any msfconsole processes first
+    pkill -9 msfconsole 2>/dev/null || true
+    
+    # Kill any child processes of this script
+    pkill -P $$ 2>/dev/null || true
+    
+    # Clean up any PID files
+    find "${SCRIPT_DIR}/targets" -name ".msf_*.pid" -delete 2>/dev/null || true
+    
+    # Restore terminal if needed (only if stdin is a terminal)
+    if [ -t 0 ]; then
+        stty sane 2>/dev/null || true
+    fi
+    
+    log_warning "Scan interrupted by user"
+    exit $exit_code
+}
+
+trap cleanup_on_exit SIGINT SIGTERM EXIT
+
 # Load libraries
 source "${SCRIPT_DIR}/lib/version.sh"
 source "${SCRIPT_DIR}/lib/utils.sh"
