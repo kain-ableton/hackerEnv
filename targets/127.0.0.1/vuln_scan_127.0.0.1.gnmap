@@ -1,0 +1,4 @@
+# Nmap 7.95 scan initiated Sun Nov 16 04:27:01 2025 as: /usr/lib/nmap/nmap --privileged --script vulners,vulscan/ -oA /home/k/hackerEnv/targets/127.0.0.1/vuln_scan_127.0.0.1 127.0.0.1
+Host: 127.0.0.1 (localhost)	Status: Up
+Host: 127.0.0.1 (localhost)	Ports: 4000/open/tcp//remoteanything///, 7001/open/tcp//afs3-callback///	Ignored State: closed (998)
+# Nmap done at Sun Nov 16 04:27:02 2025 -- 1 IP address (1 host up) scanned in 0.28 seconds

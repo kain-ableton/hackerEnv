@@ -1,0 +1,4 @@
+# Nmap 7.95 scan initiated Sun Nov 16 15:58:19 2025 as: /usr/lib/nmap/nmap --privileged --script vulners,vulscan/ -oA /home/k/hackerEnv/targets/10.10.11.87/vuln_scan_10.10.11.87 10.10.11.87
+Host: 10.10.11.87 ()	Status: Up
+Host: 10.10.11.87 ()	Ports: 22/open/tcp//ssh///	Ignored State: closed (999)
+# Nmap done at Sun Nov 16 15:58:22 2025 -- 1 IP address (1 host up) scanned in 2.52 seconds

@@ -1,0 +1,4 @@
+=== SSH Banner ===
+SSH-2.0-OpenSSH_10.0p2 Debian-8
+
+OpenSSH_10.2p1 Debian-2, OpenSSL 3.5.4 30 Sep 2025

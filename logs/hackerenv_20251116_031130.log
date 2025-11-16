@@ -1,0 +1,19 @@
+[32m[SUCCESS][0m Configuration loaded: /home/k/hackerEnv/config/settings.conf
+[1;34m[INFO][0m === Authorization Check Started ===
+[1;34m[INFO][0m Timestamp: 2025-11-16 03:11:30 GMT
+[1;34m[INFO][0m User: k
+[1;34m[INFO][0m Hostname: spectre
+[1;34m[INFO][0m Working Directory: /home/k/hackerEnv
+[1;34m[INFO][0m Checking required dependencies...
+[1;34m[INFO][0m Checking optional dependencies...
+[32m[SUCCESS][0m All required dependencies found
+[32m[SUCCESS][0m Authorization file found: .authorized_targets
+[1;34m[INFO][0m Processing 1 target(s)...
+[1;34m[INFO][0m [1/1] Processing target: 10.129.176.135
+[1;91m[ERROR][0m Target 10.129.176.135 is NOT authorized
+[1;91m[ERROR][0m Target not authorized: 10.129.176.135 - SKIPPING
+[32m[SUCCESS][0m All scans completed
+[1;34m[INFO][0m Results saved in: /home/k/hackerEnv/targets/
+[1;34m[INFO][0m Logs available in: /home/k/hackerEnv/logs/
+[1;34m[INFO][0m Authorization report saved to: ./reports/authorization_report_20251116_031130.txt
+[1;34m[INFO][0m Authorization report saved to: ./reports/authorization_report_20251116_031130.txt

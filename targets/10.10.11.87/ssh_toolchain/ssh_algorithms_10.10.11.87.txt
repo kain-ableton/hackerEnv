@@ -1,0 +1,4 @@
+=== SSH Supported Algorithms ===
+debug1: kex: algorithm: mlkem768x25519-sha256
+debug1: kex: host key algorithm: ssh-ed25519
+Unable to negotiate with 10.10.11.87 port 22: no matching cipher found. Their offer: chacha20-poly1305@openssh.com,aes128-gcm@openssh.com,aes256-gcm@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr

@@ -1,0 +1,4 @@
+# Nmap 7.95 scan initiated Sun Nov 16 15:57:48 2025 as: /usr/lib/nmap/nmap --privileged -sV -T4 -A -O -oA /home/k/hackerEnv/targets/10.10.11.87/nmap_10.10.11.87 10.10.11.87
+Host: 10.10.11.87 ()	Status: Up
+Host: 10.10.11.87 ()	Ports: 22/open/tcp//ssh//OpenSSH 10.0p2 Debian 8 (protocol 2.0)/	Ignored State: closed (999)	Seq Index: 264	IP ID Seq: All zeros
+# Nmap done at Sun Nov 16 15:58:12 2025 -- 1 IP address (1 host up) scanned in 24.36 seconds

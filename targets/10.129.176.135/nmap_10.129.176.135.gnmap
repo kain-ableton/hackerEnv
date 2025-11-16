@@ -1,0 +1,2 @@
+# Nmap 7.95 scan initiated Sun Nov 16 03:38:28 2025 as: /usr/lib/nmap/nmap --privileged -sV -T4 -A -O -oA /home/k/hackerEnv/targets/10.129.176.135/nmap_10.129.176.135 10.129.176.135
+# Nmap done at Sun Nov 16 03:38:30 2025 -- 1 IP address (0 hosts up) scanned in 2.57 seconds

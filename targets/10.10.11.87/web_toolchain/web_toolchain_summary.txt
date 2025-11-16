@@ -1,0 +1,12 @@
+==================================
+Web Toolchain Summary
+==================================
+Target: http://10.10.11.87:80
+Date: Sun 16 Nov 15:09:04 GMT 2025
+
+Tools Run:
+  ✓ whatweb
+  ✓ nikto
+  ✓ dirb
+
+Results saved in: /home/k/hackerEnv/targets/10.10.11.87/web_toolchain

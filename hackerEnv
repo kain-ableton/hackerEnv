@@ -896,7 +896,12 @@ then
     esac
 fi
 echo -e "${BOLD}Performing IP sweep is in progress${resetStyle}"
-ip a |grep -oP 'inet \K[^ ]+'| cut -f1-1 -d"/"|sed -n '2{p;q}' > ${dir_path}/urIp.txt
+tun_ip=$(ip a show tun0 2>/dev/null | grep -oP 'inet \K[^ ]+' | cut -f1 -d"/")
+if [ -n "$tun_ip" ]; then
+	echo "$tun_ip" > ${dir_path}/urIp.txt
+else
+	ip a |grep -oP 'inet \K[^ ]+'| cut -f1-1 -d"/"|sed -n '2{p;q}' > ${dir_path}/urIp.txt
+fi
 ip="$(cat ${dir_path}/urIp.txt)"
 if [ "${target}" != "" ] && [ "${interface}" != "" ] && [ "${subNetwork}" != "" ]
 then

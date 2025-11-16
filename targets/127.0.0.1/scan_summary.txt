@@ -1,0 +1,11 @@
+==================================
+Scan Summary
+==================================
+Date: Sun 16 Nov 04:27:02 GMT 2025
+Target: 127.0.0.1
+
+Services Detected:
+
+Operating System:
+
+Open Ports:

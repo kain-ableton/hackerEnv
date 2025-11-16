@@ -1,0 +1,9 @@
+NSE: failed to initialize the script engine:
+/usr/share/nmap/nse_main.lua:832: directory '/usr/share/nmap/scripts/vulscan' found, but will not match without '/'
+stack traceback:
+	[C]: in function 'error'
+	/usr/share/nmap/nse_main.lua:832: in local 'get_chosen_scripts'
+	/usr/share/nmap/nse_main.lua:1364: in main chunk
+	[C]: in ?
+
+QUITTING!

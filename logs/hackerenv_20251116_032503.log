@@ -1,0 +1,14 @@
+[32m[SUCCESS][0m Configuration loaded: /home/k/hackerEnv/config/settings.conf
+[1;34m[INFO][0m Checking required dependencies...
+[1;34m[INFO][0m Checking optional dependencies...
+[32m[SUCCESS][0m All required dependencies found
+[1;34m[INFO][0m Processing 1 target(s)...
+[1;34m[INFO][0m [1/1] Processing target: 127.0.0.1
+[1;34m[INFO][0m Starting UDP scan on: 127.0.0.1
+[1;33m[WARNING][0m UDP scans are typically slow
+[1;91m[ERROR][0m Nmap scan failed for 127.0.0.1
+[1;91m[ERROR][0m Scan failed for target: 127.0.0.1
+[1;34m[INFO][0m [1/1] Completed: 127.0.0.1
+[32m[SUCCESS][0m All scans completed
+[1;34m[INFO][0m Results saved in: /home/k/hackerEnv/targets/
+[1;34m[INFO][0m Logs available in: /home/k/hackerEnv/logs/

@@ -1,0 +1,4 @@
+# Nmap 7.95 scan initiated Sun Nov 16 15:58:12 2025 as: /usr/lib/nmap/nmap --privileged --script http-enum,http-headers,http-methods,http-robots.txt,http-title,http-shellshock,http-vuln-* -sV -oA /home/k/hackerEnv/targets/10.10.11.87/service_scripts_10.10.11.87_http 10.10.11.87
+Host: 10.10.11.87 ()	Status: Up
+Host: 10.10.11.87 ()	Ports: 22/open/tcp//ssh//OpenSSH 10.0p2 Debian 8 (protocol 2.0)/	Ignored State: closed (999)
+# Nmap done at Sun Nov 16 15:58:15 2025 -- 1 IP address (1 host up) scanned in 3.32 seconds

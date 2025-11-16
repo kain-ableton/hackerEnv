@@ -1,0 +1,4 @@
+# Nmap 7.95 scan initiated Sun Nov 16 03:38:31 2025 as: /usr/lib/nmap/nmap --privileged -sV -T4 -A -O -Pn -oA /home/k/hackerEnv/targets/10.129.176.135/nmap_10.129.176.135_retry 10.129.176.135
+Host: 10.129.176.135 ()	Status: Up
+Host: 10.129.176.135 ()	Ports: 	Ignored State: filtered (1000)
+# Nmap done at Sun Nov 16 03:39:36 2025 -- 1 IP address (1 host up) scanned in 65.27 seconds

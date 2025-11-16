@@ -1,0 +1,484 @@
+#!/bin/bash
+# hackerEnv v2.0.1 - Main orchestrator
+# Refactored for better security, maintainability, and reliability
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Load libraries
+source "${SCRIPT_DIR}/lib/version.sh"
+source "${SCRIPT_DIR}/lib/utils.sh"
+source "${SCRIPT_DIR}/lib/progress.sh"
+source "${SCRIPT_DIR}/lib/report_generator.sh"
+source "${SCRIPT_DIR}/lib/statistics.sh"
+source "${SCRIPT_DIR}/core/scanner.sh"
+
+# Load modules
+source "${SCRIPT_DIR}/modules/ssh.sh"
+source "${SCRIPT_DIR}/modules/metasploit.sh"
+source "${SCRIPT_DIR}/modules/hydra.sh"
+source "${SCRIPT_DIR}/modules/post_exploitation.sh"
+
+# Load toolchain manager
+if [ -f "${SCRIPT_DIR}/toolchains/toolchain_manager.sh" ]; then
+    source "${SCRIPT_DIR}/toolchains/toolchain_manager.sh"
+    TOOLCHAINS_AVAILABLE=true
+else
+    TOOLCHAINS_AVAILABLE=false
+fi
+
+function show_banner() {
+    cat <<'EOF'
+ _    _               _                ______              
+| |  | |             | |              |  ____|             
+| |__| |  __ _   ___ | | __ ___  _ __ | |__    _ __ __   __
+|  __  | / _` | / __|| |/ // _ \| '__||  __|  | '_ \\ \ / /
+| |  | || (_| || (__ |   <|  __/| |   | |____ | | | |\ V / 
+|_|  |_| \__,_| \___||_|\_\\___||_|   |______||_| |_| \_/  
+
+EOF
+    echo -e "${RED}HackerEnv v${VERSION}${RESET}"
+    echo -e "${RED}Automated Penetration Testing Framework${RESET}"
+    echo ""
+}
+
+function show_disclaimer() {
+    cat <<EOF
+${RED}╔════════════════════════════════════════════════════════════════╗
+║                    LEGAL DISCLAIMER                            ║
+╚════════════════════════════════════════════════════════════════╝${RESET}
+
+${YELLOW}WARNING:${RESET} This tool is designed for AUTHORIZED security testing only.
+
+By using this program, you agree to:
+  • Only scan/test systems you OWN or have WRITTEN permission to test
+  • Comply with all applicable local, state, and federal laws
+  • Accept FULL responsibility for your actions
+  
+Unauthorized use may result in:
+  • Criminal prosecution
+  • Civil liability  
+  • Network damage
+  • Loss of access privileges
+
+${BOLD}The developers assume NO liability for misuse or damage.${RESET}
+
+All activity is logged for audit purposes.
+
+EOF
+}
+
+function show_help() {
+    cat <<EOF
+Usage: hackerEnv [OPTIONS]
+
+Options:
+  -t, --target <IP>          Target IP address or network (CIDR)
+  -i, --interface <IF>       Network interface to use
+  -s, --subnet <MASK>        Subnet mask (e.g., 24)
+  -a, --attacker <IP>        Attacker IP address
+  -m, --mode <MODE>          Scan mode: quick, normal, full, stealth, udp (default: normal)
+  -e, --aggressive           Enable aggressive scanning mode
+  -c, --config <FILE>        Configuration file (default: config/settings.conf)
+  -v, --verbose              Verbose mode (show info messages)
+  -vv, --very-verbose        Very verbose mode (show info + verbose messages)
+  -vvv, --debug              Debug mode (show all messages)
+  -q, --quiet                Quiet mode (errors only)
+  --bruteforce               Enable password bruteforce attacks (Hydra)
+  --no-vuln-scan             Skip vulnerability scanning
+  --toolchain <LIST>         Run specific toolchains (web,smb,dns,all or auto)
+  --no-toolchains            Skip toolchain execution
+  -oA, --report              Generate HTML and DOCX reports
+  --html-only                Generate HTML report only
+  -h, --help                 Display this help message
+  --update                   Update tool from GitHub
+  --version                  Show version information
+
+Scan Modes:
+  quick    - Fast scan of common ports (top 100)
+  normal   - Standard scan with service detection (default)
+  full     - Comprehensive scan of all 65535 ports
+  stealth  - Slow, stealthy SYN scan to avoid detection
+  udp      - UDP port scan (slow)
+
+Examples:
+  hackerEnv -t 192.168.1.100
+  hackerEnv -t 192.168.1.100 -m quick -v
+  hackerEnv -t 192.168.1.0/24 -m stealth -vv
+  hackerEnv -t 192.168.1.0/24 --aggressive --debug
+  hackerEnv -i eth0 -s 24 -q
+  hackerEnv -t 10.10.10.10 --bruteforce --verbose
+  hackerEnv -t example.com --toolchain web -oA
+  hackerEnv -t 192.168.1.100 --toolchain auto -vvv
+
+Verbosity Levels:
+  -q, --quiet         Level 0: Errors only
+  (default)           Level 1: Errors, warnings, success
+  -v, --verbose       Level 2: + Info messages
+  -vv                 Level 2: + Verbose details
+  -vvv, --debug       Level 3: + Debug messages
+
+Toolchains:
+  auto     - Automatically detect and run applicable toolchains
+  web      - Web application assessment (whatweb, nikto, dirb)
+  smb      - SMB/CIFS enumeration (enum4linux, smbmap)
+  dns      - DNS reconnaissance (zone transfer, subdomain enum)
+  database - Database enumeration (MySQL, PostgreSQL, MongoDB, Redis)
+  ftp      - FTP assessment (anonymous access, banner grab)
+  smtp     - SMTP enumeration (relay test, user enum, VRFY)
+  ssh      - SSH assessment (banner, keys, algorithms, auth methods)
+  all      - Run all available toolchains
+
+Configuration:
+  Edit config/settings.conf to customize behavior
+
+Logs:
+  Activity: logs/hackerenv_*.log
+  Reports:  reports/
+
+For more information: https://github.com/abdulr7mann/hackerEnv
+EOF
+}
+
+function parse_arguments() {
+    # Default values
+    CONFIG_FILE="${SCRIPT_DIR}/config/settings.conf"
+    TARGET=""
+    INTERFACE=""
+    SUBNET=""
+    ATTACKER_IP=""
+    SCAN_MODE="normal"
+    TOOLCHAIN_MODE="auto"
+    RUN_TOOLCHAINS=true
+    ENABLE_BRUTEFORCE=false
+    GENERATE_REPORT=false
+    GENERATE_DOCX=false
+    
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            --version)
+                echo "HackerEnv v${VERSION}"
+                exit 0
+                ;;
+            -t|--target)
+                TARGET="$2"
+                shift 2
+                ;;
+            -i|--interface)
+                INTERFACE="$2"
+                shift 2
+                ;;
+            -s|--subnet)
+                SUBNET="$2"
+                shift 2
+                ;;
+            -a|--attacker)
+                ATTACKER_IP="$2"
+                shift 2
+                ;;
+            -m|--mode)
+                SCAN_MODE="$2"
+                shift 2
+                ;;
+            -e|--aggressive)
+                export CONFIG_AGGRESSIVE_MODE=true
+                shift
+                ;;
+            -c|--config)
+                CONFIG_FILE="$2"
+                shift 2
+                ;;
+            -v|--verbose)
+                export VERBOSITY=2
+                shift
+                ;;
+            -vv|--very-verbose)
+                export VERBOSITY=2
+                shift
+                ;;
+            -vvv|--debug)
+                export VERBOSITY=3
+                shift
+                ;;
+            -q|--quiet)
+                export VERBOSITY=0
+                shift
+                ;;
+            --bruteforce)
+                ENABLE_BRUTEFORCE=true
+                export CONFIG_BRUTEFORCE_ENABLED=true
+                shift
+                ;;
+            --no-vuln-scan)
+                export CONFIG_VULN_SCAN_ENABLED=false
+                log_info "Vulnerability scanning disabled"
+                shift
+                ;;
+            --toolchain)
+                TOOLCHAIN_MODE="$2"
+                export TOOLCHAIN_MODE
+                shift 2
+                ;;
+            --no-toolchains)
+                RUN_TOOLCHAINS=false
+                export RUN_TOOLCHAINS
+                log_info "Toolchain execution disabled"
+                shift
+                ;;
+            -oA|--report)
+                GENERATE_REPORT=true
+                GENERATE_DOCX=true
+                shift
+                ;;
+            --html-only)
+                GENERATE_REPORT=true
+                GENERATE_DOCX=false
+                shift
+                ;;
+            --update)
+                update_tool
+                exit 0
+                ;;
+            *)
+                log_error "Unknown option: $1"
+                show_help
+                exit 1
+                ;;
+        esac
+    done
+    
+    # Validate scan mode
+    case "$SCAN_MODE" in
+        quick|normal|full|stealth|udp)
+            export SCAN_MODE
+            ;;
+        *)
+            log_error "Invalid scan mode: $SCAN_MODE"
+            log_error "Valid modes: quick, normal, full, stealth, udp"
+            exit 1
+            ;;
+    esac
+}
+
+function update_tool() {
+    log_info "Checking for updates..."
+    
+    if [ ! -d "${SCRIPT_DIR}/.git" ]; then
+        log_error "Not a git repository - cannot update"
+        return 1
+    fi
+    
+    cd "${SCRIPT_DIR}"
+    
+    local current_version=$(git describe --tags 2>/dev/null || echo "unknown")
+    log_info "Current version: $current_version"
+    
+    git fetch origin
+    local latest_version=$(git describe --tags origin/master 2>/dev/null || echo "unknown")
+    log_info "Latest version: $latest_version"
+    
+    if [ "$current_version" != "$latest_version" ]; then
+        log_warning "Update available: $current_version -> $latest_version"
+        read -p "Update now? [y/N]: " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            git pull origin master
+            log_success "Update complete - please restart hackerEnv"
+        fi
+    else
+        log_success "Already up to date"
+    fi
+}
+
+function validate_inputs() {
+    # Validate target IP/CIDR
+    if [ -n "$TARGET" ]; then
+        # Check if CIDR notation
+        if [[ "$TARGET" =~ / ]]; then
+            if ! valid_cidr "$TARGET"; then
+                error_exit "Invalid CIDR notation: $TARGET"
+            fi
+        else
+            # Check if valid IP
+            if ! valid_ip "$TARGET"; then
+                error_exit "Invalid IP address: $TARGET"
+            fi
+        fi
+        TARGET=$(sanitize_ip "$TARGET")
+    fi
+    
+    # Validate subnet
+    if [ -n "$SUBNET" ]; then
+        if ! [[ "$SUBNET" =~ ^[0-9]+$ ]] || [ "$SUBNET" -lt 0 ] || [ "$SUBNET" -gt 32 ]; then
+            error_exit "Invalid subnet mask: $SUBNET (must be 0-32)"
+        fi
+    fi
+    
+    # Validate attacker IP
+    if [ -n "$ATTACKER_IP" ]; then
+        if ! valid_ip "$ATTACKER_IP"; then
+            error_exit "Invalid attacker IP: $ATTACKER_IP"
+        fi
+    fi
+}
+
+function main() {
+    show_banner
+    show_disclaimer
+    
+    # Parse command line arguments
+    parse_arguments "$@"
+    
+    # Show verbosity level
+    case "${VERBOSITY:-1}" in
+        0) log_debug "Verbosity: QUIET (errors only)" ;;
+        1) log_debug "Verbosity: NORMAL (errors, warnings, success)" ;;
+        2) log_debug "Verbosity: VERBOSE (+ info messages)" ;;
+        3) log_debug "Verbosity: DEBUG (all messages)" ;;
+    esac
+    
+    # Load configuration
+    if [ -f "$CONFIG_FILE" ]; then
+        load_config "$CONFIG_FILE"
+        log_success "Configuration loaded: $CONFIG_FILE"
+    else
+        log_warning "Configuration file not found: $CONFIG_FILE"
+        log_warning "Using default settings"
+    fi
+    
+    # Check dependencies
+    check_dependencies || error_exit "Missing required dependencies"
+    
+    # Validate inputs
+    validate_inputs
+    
+    # Determine targets
+    local targets_file="${SCRIPT_DIR}/logs/targets_$(date +%s).txt"
+    
+    if [ -n "$TARGET" ]; then
+        # Single target or CIDR range
+        if [[ "$TARGET" =~ / ]]; then
+            log_info "Discovering hosts in network: $TARGET"
+            discover_hosts "$TARGET" "$targets_file"
+        else
+            echo "$TARGET" > "$targets_file"
+        fi
+    elif [ -n "$INTERFACE" ] && [ -n "$SUBNET" ]; then
+        # Scan local network
+        local local_ip=$(ip addr show "$INTERFACE" | grep -oP 'inet \K[^/]+' | head -1)
+        if [ -z "$local_ip" ]; then
+            error_exit "Could not determine IP for interface: $INTERFACE"
+        fi
+        log_info "Scanning local network: ${local_ip}/${SUBNET}"
+        discover_hosts "${local_ip}/${SUBNET}" "$targets_file"
+    else
+        error_exit "No target specified. Use -t <IP> or -i <interface> -s <subnet>"
+    fi
+    
+    # Process each target
+    local target_count=$(wc -l < "$targets_file")
+    log_info "Processing $target_count target(s)..."
+    
+    local current=0
+    while IFS= read -r target; do
+        current=$((current + 1))
+        log_info "[$current/$target_count] Processing target: $target"
+        
+        # Create target directory
+        local target_dir="${SCRIPT_DIR}/targets/${target}"
+        safe_create_dir "$target_dir"
+        
+        # Scan target
+        if scan_host "$target" "$target_dir"; then
+            extract_services "${target_dir}/nmap_${target}.xml"
+            
+            # Run vulnerability scan (if enabled)
+            if [ "${CONFIG_VULN_SCAN_ENABLED:-true}" = "true" ]; then
+                scan_vulnerabilities "$target" "$target_dir"
+            else
+                log_debug "Vulnerability scanning disabled"
+            fi
+            
+            # Run modules
+            log_info "Running exploit modules for: $target"
+            ssh_module_main "$target" "$target_dir"
+            
+            # Run Metasploit exploits (auto-detects LHOST, prioritizes tun0)
+            log_info "Running Metasploit module for: $target"
+            metasploit_module_main "$target" "$target_dir" || true
+            
+            # Run Hydra brute force (if enabled)
+            if [ "$ENABLE_BRUTEFORCE" = true ]; then
+                log_info "Running Hydra brute force for: $target"
+                hydra_module_main "$target" "$target_dir" "true" || true
+            fi
+            
+            # Run toolchains (if enabled and available)
+            if [ "$RUN_TOOLCHAINS" = true ] && [ "$TOOLCHAINS_AVAILABLE" = true ]; then
+                log_info "Running toolchains for: $target"
+                
+                if [ "$TOOLCHAIN_MODE" = "auto" ]; then
+                    run_auto_toolchains "$target" "$target_dir"
+                else
+                    run_specified_toolchains "$target" "$target_dir" "$TOOLCHAIN_MODE"
+                fi
+                
+                # Generate combined toolchain report
+                generate_toolchain_report "$target_dir"
+            elif [ "$RUN_TOOLCHAINS" = true ] && [ "$TOOLCHAINS_AVAILABLE" = false ]; then
+                log_warning "Toolchains requested but not available"
+            fi
+            
+            # Generate summary
+            generate_scan_summary "$target_dir"
+            
+            # Post-exploitation analysis
+            log_info "Running post-exploitation analysis for: $target"
+            post_exploitation_main "$target_dir" || true
+        else
+            log_error "Scan failed for target: $target"
+        fi
+        
+        log_info "[$current/$target_count] Completed: $target"
+        echo ""
+    done < "$targets_file"
+    
+    log_success "All scans completed"
+    log_info "Results saved in: ${SCRIPT_DIR}/targets/"
+    log_info "Logs available in: ${SCRIPT_DIR}/logs/"
+    
+    # Generate statistics
+    log_info "Generating scan statistics..."
+    generate_statistics "${SCRIPT_DIR}/targets"
+    generate_risk_assessment "${SCRIPT_DIR}/targets"
+    
+    # Generate reports if requested
+    if [ "$GENERATE_REPORT" = true ]; then
+        log_info "Generating reports..."
+        generate_full_report "${SCRIPT_DIR}/targets" "${SCRIPT_DIR}" "$GENERATE_DOCX"
+    fi
+    
+    # Final summary
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║                    SCAN COMPLETED                            ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    echo "📁 Output Directories:"
+    echo "   Scan Results:  ${SCRIPT_DIR}/targets/"
+    echo "   Logs:          ${SCRIPT_DIR}/logs/"
+    [ -f "${SCRIPT_DIR}/report.html" ] && echo "   HTML Report:   ${SCRIPT_DIR}/report.html"
+    [ -f "${SCRIPT_DIR}/report.docx" ] && echo "   DOCX Report:   ${SCRIPT_DIR}/report.docx"
+    echo ""
+    echo "📊 Statistics:"
+    echo "   JSON Stats:    ${SCRIPT_DIR}/scan_statistics.json"
+    echo "   Risk Report:   ${SCRIPT_DIR}/risk_assessment.txt"
+    echo ""
+}
+
+# Run main function
+main "$@"

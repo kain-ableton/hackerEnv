@@ -1,0 +1,22 @@
+==========================================
+Metasploit Exploitation Summary
+==========================================
+Target: 10.10.11.87
+Date: 2025-11-16 15:58:30
+
+Resource Files Generated:
+  - apache_mod_cgi.rc
+
+Exploit Results:
+
+  📋 Exploit: apache_mod_cgi
+     \e[1;33m✗ No session opened\e[0m
+     Log: /home/k/hackerEnv/targets/10.10.11.87/metasploit/msf_apache_mod_cgi.log
+
+==========================================
+
+No sessions opened from exploitation attempts.
+
+Detailed Logs:
+  Directory: /home/k/hackerEnv/targets/10.10.11.87/metasploit
+  View logs: ls -lh /home/k/hackerEnv/targets/10.10.11.87/metasploit/*.log

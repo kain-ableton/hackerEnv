@@ -1,0 +1,22 @@
+# Nmap 7.95 scan initiated Sun Nov 16 03:38:31 2025 as: /usr/lib/nmap/nmap --privileged -sV -T4 -A -O -Pn -oA /home/k/hackerEnv/targets/10.129.176.135/nmap_10.129.176.135_retry 10.129.176.135
+Nmap scan report for 10.129.176.135
+Host is up (3.1s latency).
+All 1000 scanned ports on 10.129.176.135 are in ignored states.
+Not shown: 965 filtered tcp ports (no-response), 35 filtered tcp ports (host-unreach)
+Too many fingerprints match this host to give specific OS details
+
+TRACEROUTE (using proto 1/icmp)
+HOP RTT        ADDRESS
+1   83.08 ms   10.10.14.1
+2   ... 7
+8   1142.03 ms 10.10.14.1
+9   1141.94 ms 10.10.14.1
+10  1141.90 ms 10.10.14.1
+11  ...
+12  1189.44 ms 10.10.14.1
+13  1189.52 ms 10.10.14.1
+14  1189.57 ms 10.10.14.1
+15  ... 30
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sun Nov 16 03:39:36 2025 -- 1 IP address (1 host up) scanned in 65.27 seconds

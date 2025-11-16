@@ -1,0 +1,10 @@
+# Nmap 7.95 scan initiated Sun Nov 16 03:39:36 2025 as: /usr/lib/nmap/nmap --privileged --script nmap-vulners,vulscan -oA /home/k/hackerEnv/targets/10.129.176.135/vuln_scan_10.129.176.135 10.129.176.135
+NSE: failed to initialize the script engine:
+/usr/share/nmap/nse_main.lua:832: directory '/usr/share/nmap/scripts/vulscan' found, but will not match without '/'
+stack traceback:
+	[C]: in function 'error'
+	/usr/share/nmap/nse_main.lua:832: in local 'get_chosen_scripts'
+	/usr/share/nmap/nse_main.lua:1364: in main chunk
+	[C]: in ?
+
+QUITTING!

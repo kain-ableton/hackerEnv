@@ -1,0 +1,20 @@
+[1;34m[INFO][0m Toolchain execution disabled
+[1;34m[INFO][0m Vulnerability scanning disabled
+[32m[SUCCESS][0m Configuration loaded: /home/k/hackerEnv/config/settings.conf
+[1;34m[INFO][0m Checking required dependencies...
+[1;34m[INFO][0m Checking optional dependencies...
+[32m[SUCCESS][0m All required dependencies found
+[1;34m[INFO][0m Processing 1 target(s)...
+[1;34m[INFO][0m [1/1] Processing target: 127.0.0.1
+[1;34m[INFO][0m Starting QUICK scan on: 127.0.0.1 (top 100 ports)
+[32m[SUCCESS][0m Port scan completed for 127.0.0.1
+[1;34m[INFO][0m Parsing scan results...
+[1;34m[INFO][0m Open ports found:
+[1;34m[INFO][0m Running service-specific nmap scripts for 127.0.0.1
+[1;34m[INFO][0m Starting vulnerability scan on: 127.0.0.1
+[32m[SUCCESS][0m Vulnerability scan completed for 127.0.0.1
+[1;34m[INFO][0m Running exploit modules for: 127.0.0.1
+[1;34m[INFO][0m [SSH] Starting SSH module for: 127.0.0.1
+[1;34m[INFO][0m [SSH] Checking SSH vulnerabilities for: 127.0.0.1
+[1;34m[INFO][0m [SSH] SSH port not open on 127.0.0.1
+[1;34m[INFO][0m [SSH] SSH module completed for: 127.0.0.1
