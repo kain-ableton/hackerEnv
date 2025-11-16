@@ -73,10 +73,13 @@ function valid_ip()
     return $stat
 }
 function cleanning(){
-if [ -f ${dir_path}/online.txt ] && [ -f ${dir_path}/online.txt ]
+if [ -f "${dir_path}/online.txt" ]
 then
-	rm ${dir_path}/online.txt
-	rm ${dir_path}/urIp.txt
+        rm "${dir_path}/online.txt"
+fi
+if [ -f "${dir_path}/urIp.txt" ]
+then
+        rm "${dir_path}/urIp.txt"
 fi
 if [ ! -d ${dir_path}/exploits/ ]
 then
@@ -119,13 +122,15 @@ function dependencies(){
         cd - > /dev/null 2>&1
         echo "Done"
     fi
-    if [ ! -f /usr/share/wordlists/rockyou.txt ] && [ -f /usr/share/wordlists/rockyou.txt.gz ]
-	then
-        wget -q -P /usr/share/wordlists/ https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
-    elif [ ! -f /usr/share/wordlists/rockyou.txt ]
+    if [ ! -f /usr/share/wordlists/rockyou.txt ]
     then
-		gzip -d /usr/share/wordlists/rockyou.txt.gz > /dev/null 2>&1
-	fi
+        if [ -f /usr/share/wordlists/rockyou.txt.gz ]
+        then
+                gzip -d /usr/share/wordlists/rockyou.txt.gz > /dev/null 2>&1
+        else
+                wget -q -P /usr/share/wordlists/ https://github.com/brannondorsey/naive-hashcat/releases/download/data/rockyou.txt
+        fi
+    fi
 }
 function terminals(){
 	query () {
@@ -858,24 +863,25 @@ header
 
 if [ "${target}" != "" ]
 then
-    for ip in "$(printf ${target})"
+    while IFS= read -r ip
     do
-        if valid_ip ${ip}
+        [ -z "${ip}" ] && continue
+        if valid_ip "${ip}"
         then
             stat='good'
         else
             echo -e "${RED}Invalid Target IP: ${ip} ${resetStyle}\n$(basename $0) -h, --help   Display help message."
             exit
         fi
-    done
+    done <<< "$(printf '%s\n' "${target}")"
 fi
 if [ "${attacker}" != "" ]
 then
-    if valid_ip ${attacker}
+    if valid_ip "${attacker}"
     then
         stat='good'
     else
-        echo -e "${RED}Invalid attacker IP: ${ip} ${resetStyle}\n$(basename $0) -h, --help   Display help message."
+        echo -e "${RED}Invalid attacker IP: ${attacker} ${resetStyle}\n$(basename $0) -h, --help   Display help message."
         exit
     fi
 fi
