@@ -200,14 +200,17 @@ function wait_for_job() {
     while kill -0 "$pid" 2>/dev/null; do
         if [ $elapsed -ge $timeout ]; then
             log_warning "Job $job_name timed out after ${timeout}s"
-            kill "$pid" 2>/dev/null || true
+            kill -TERM "$pid" 2>/dev/null || true
+            sleep 0.5
+            kill -KILL "$pid" 2>/dev/null || true
             return 1
         fi
         sleep 1
         ((elapsed++))
     done
     
-    wait "$pid"
+    # Use wait with a timeout-like approach
+    wait "$pid" 2>/dev/null || true
     local exit_code=$?
     unset "BACKGROUND_JOBS[$job_name]"
     
@@ -234,11 +237,18 @@ function wait_for_all_jobs() {
 }
 
 function cleanup_jobs() {
+    # Kill all background jobs immediately on interrupt
     for job_name in "${!BACKGROUND_JOBS[@]}"; do
         local pid="${BACKGROUND_JOBS[$job_name]}"
         if kill -0 "$pid" 2>/dev/null; then
             log_warning "Killing job: $job_name (PID: $pid)"
-            kill -9 "$pid" 2>/dev/null || true
+            # Kill process group to stop all children
+            kill -TERM -"$pid" 2>/dev/null || true
+            sleep 0.5
+            # Force kill if still alive
+            if kill -0 "$pid" 2>/dev/null; then
+                kill -KILL -"$pid" 2>/dev/null || true
+            fi
         fi
     done
     BACKGROUND_JOBS=()
@@ -269,6 +279,14 @@ function load_config() {
     log_debug "Configuration loaded from: $config_file"
 }
 
+# Cleanup handler with immediate exit on interrupt
+function handle_interrupt() {
+    echo "" >&2
+    log_warning "Interrupt received - cleaning up..."
+    cleanup_jobs
+    exit 130
+}
+
 # Error handling
 function error_exit() {
     log_error "$1"
@@ -276,7 +294,9 @@ function error_exit() {
     exit "${2:-1}"
 }
 
-trap cleanup_jobs EXIT INT TERM
+# Set up signal handlers
+trap handle_interrupt INT
+trap cleanup_jobs EXIT TERM
 
 # Export functions for use in other scripts
 export -f log_msg log_info log_success log_error log_warning log_debug

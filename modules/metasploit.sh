@@ -152,8 +152,9 @@ function metasploit_run_exploit() {
     log_info "[$MODULE_NAME] Metasploit running (PID: $msf_pid)"
     log_info "[$MODULE_NAME] Log file: $log_file"
     
-    # Save PID for tracking
+    # Save PID for tracking and cleanup
     echo "$msf_pid" > "${output_dir}/.msf_${exploit_name}.pid"
+    MSF_PIDS["$exploit_name"]=$msf_pid
     
     return 0
 }
@@ -171,24 +172,44 @@ function metasploit_wait_jobs() {
         for pid_file in "${output_dir}"/.msf_*.pid; do
             [ -f "$pid_file" ] || continue
             local pid
-            pid=$(cat "$pid_file")
-            if ps -p "$pid" > /dev/null 2>&1; then
+            pid=$(cat "$pid_file" 2>/dev/null || echo "0")
+            if [ "$pid" != "0" ] && ps -p "$pid" > /dev/null 2>&1; then
                 running=$((running + 1))
             else
                 rm -f "$pid_file"
+                # Also remove from global tracking
+                local fname=$(basename "$pid_file" .pid)
+                fname="${fname#.msf_}"
+                unset "MSF_PIDS[$fname]"
             fi
         done
         
         if [ $running -eq 0 ]; then
             log_success "[$MODULE_NAME] All Metasploit jobs completed"
+            MSF_PIDS=()
             return 0
         fi
         
-        sleep 5
-        elapsed=$((elapsed + 5))
+        # Use shorter sleep with checks to be more responsive to interrupts
+        sleep 2 || return 1
+        elapsed=$((elapsed + 2))
     done
     
-    log_warning "[$MODULE_NAME] Timeout reached, some jobs may still be running"
+    log_warning "[$MODULE_NAME] Timeout reached, killing remaining jobs"
+    # Kill any remaining jobs
+    for pid_file in "${output_dir}"/.msf_*.pid; do
+        [ -f "$pid_file" ] || continue
+        local pid
+        pid=$(cat "$pid_file" 2>/dev/null || echo "0")
+        if [ "$pid" != "0" ] && ps -p "$pid" > /dev/null 2>&1; then
+            log_warning "[$MODULE_NAME] Killing MSF process: $pid"
+            kill -TERM "$pid" 2>/dev/null || true
+            sleep 0.5
+            kill -KILL "$pid" 2>/dev/null || true
+        fi
+        rm -f "$pid_file"
+    done
+    
     return 0
 }
 
